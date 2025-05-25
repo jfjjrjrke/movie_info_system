@@ -1,0 +1,4 @@
+# db.properties.example
+db.url=jdbc:mysql://localhost:3306/movie_db
+db.user=root
+db.password=your_local_password

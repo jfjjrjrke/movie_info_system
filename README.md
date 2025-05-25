@@ -2,7 +2,7 @@
 
 ## 📌 프로젝트 소개
 
-사용자가 원한 영화의 정보를 TMDB API로 검색하고, 해당 영화에 대한 상세정보, 리뷰를 확인할 수 있으며, 즐겨찾기로 저장할 수 있는 Java 기반의 영화 정보 관리 시스템입니다.
+사용자가 원하는 영화의 정보를 TMDB API로 검색하고, 해당 영화에 대한 상세정보, 리뷰를 확인할 수 있으며, 즐겨찾기로 저장할 수 있는 Java 기반의 영화 정보 관리 시스템입니다.
 
 ## 🛠 사용 기술
 
@@ -20,6 +20,10 @@ MovieInfoProject/
 ├── .gitignore                  # Git 제외 파일 설정
 ├── movie_db_dump.sql          # DB 전체 복원용 덤프
 ├── create_tables.sql          # DB 테이블 생성 SQL
+├── db.properties              # 실제 DB 연결 설정 파일 (Git에는 업로드 안 됨)
+├── db.properties.example      # DB 연결 예시 설정 파일 (GitHub에 포함)
+├── apikey.properties           # TMDB API 키 설정 파일 (Git에는 업로드 안 됨)
+├── apikey.properties.example   # TMDB API 예시 설정 파일 (GitHub에 포함)
 ├── src/
 │   ├── main/                  # 실행 시작점
 │   │   └── Main.java
@@ -36,34 +40,62 @@ MovieInfoProject/
 │   ├── dto/                   # 데이터 전송 객체
 │   │   ├── MovieDTO.java
 │   │   └── ReviewDTO.java
-│   └── dao/                   # DB 처리 클래스
-│       ├── MovieDAO.java
-│       ├── ReviewDAO.java
-│       └── DBUtil.java
+│   ├── dao/                   # DB 처리 클래스
+│   │   ├── MovieDAO.java
+│   │   ├── ReviewDAO.java
+│   │   └── DBUtil.java
+│   └── test/                  # 테스트 코드
+│       └── DBTest.java        # DB 연결 테스트용 클래스
 ```
 
 ## ▶ 실행 방법
 
-1. `apikey.properties` 파일 생성 (루트 경로)
+### ✅ API 설정 방법
 
-```
+1. `apikey.properties.example` 파일을 복사해 `apikey.properties`로 변경
+2. 해당 파일에 TMDB API 키 입력
+
+```properties
 TMDB_API_KEY=your_tmdb_api_key
 ```
 
-2. `create_tables.sql` 실행하여 MySQL DB에 테이블 생성
+### ✅ DB 설정 방법
 
-3. Eclipse 또는 IntelliJ에서 프로젝트 실행
+1. `db.properties.example` 파일을 복사해 `db.properties`로 변경 (Git에는 업로드하지 않음)
+2. 로컬 또는 클라우드 DB 접속 정보를 입력
 
-   * `Main.java` 실행 시 `MainFrame` 실행됩니다.
+```properties
+db.url=jdbc:mysql://localhost:3306/movie_db
+db.user=root
+db.password=your_password
+```
 
-4. 영화 검색 → 상세정보 확인 → 즐겨찾기 및 리뷰 확인 가능
+3. `create_tables.sql` 또는 `movie_db_dump.sql`을 DBeaver에서 실행하여 테이블 구조 생성 또는 전체 복원
+4. Eclipse 또는 IntelliJ에서 `Main.java` 실행 → `MainFrame` 실행됨
+5. 영화 검색 → 상세정보 확인 → 즐겨찾기 및 리뷰 확인 가능
 
-### \[DB 설정 방법 - 덕프 파일 기준]
+### ✅ DB 연결 테스트 방법
 
-1. MySQL 설치
-2. DBeaver 시작 → SQL Editor 열기
-3. `movie_db_dump.sql` 열고 전체 실행 (Ctrl+A → Ctrl+Enter)
-4. 완료 후 `movie_db` 확인
+* `src/test/DBTest.java` 실행
+
+```java
+import java.sql.Connection;
+import dao.DBUtil;
+
+public class DBTest {
+    public static void main(String[] args) {
+        try (Connection conn = DBUtil.getConnection()) {
+            if (conn != null) {
+                System.out.println("✅ DB 연결 성공!");
+            } else {
+                System.out.println("❌ DB 연결 실패!");
+            }
+        } catch (Exception e) {
+            System.out.println("❌ 예외 발생: " + e.getMessage());
+        }
+    }
+}
+```
 
 ## 👥 팀원별 역할
 
@@ -75,10 +107,11 @@ TMDB_API_KEY=your_tmdb_api_key
 
 ## 📌 주의사항
 
-* `apikey.properties` 파일은 Git에 올린이없고, 예시로 `apikey.properties.example` 제공
-* JDBC 드라이버가 classpath에 포함되어야 정상 동작
+* `apikey.properties`와 `db.properties`는 Git에 업로드하지 않음 → `.gitignore`에 반드시 추가
+* 예시 파일(`apikey.properties.example`, `db.properties.example`)만 GitHub에 공유
+* JDBC 드라이버가 classpath에 포함되어 있어야 정상 동작
 * TMDB API는 하루 호출 수 제한이 있음
 
 ---
 
-본 프로젝트는 영화 정보 검색과 저장을 학습 목적으로 구현한 예제이며, 상업적 용도는 아니입니다.
+본 프로젝트는 영화 정보 검색과 저장을 학습 목적으로 구현한 예제이며, 상업적 용도는 아닙니다.
