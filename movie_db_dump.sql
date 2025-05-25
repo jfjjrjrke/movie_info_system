@@ -28,7 +28,7 @@ CREATE TABLE `favorite` (
   `user_id` varchar(100) DEFAULT NULL,
   `added_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`favorite_id`),
-  KEY `movie_id` (`movie_id`),
+  UNIQUE KEY `uq_favorite` (`movie_id`,`user_id`),
   CONSTRAINT `favorite_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -83,7 +83,7 @@ CREATE TABLE `review` (
   `content` text,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`review_id`),
-  KEY `movie_id` (`movie_id`),
+  UNIQUE KEY `uq_movie_reviewer` (`movie_id`,`reviewer`),
   CONSTRAINT `review_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -110,4 +110,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-25 13:41:37
+-- Dump completed on 2025-05-25 19:43:59
