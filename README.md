@@ -53,6 +53,13 @@ TMDB_API_KEY=your_tmdb_api_key
 
 4. 영화 검색 → 상세정보 확인 → 즐겨찾기 및 리뷰 확인 가능
 
+### [DB 설정 방법 - 덤프 파일 기준]
+
+1. MySQL 설치
+2. DBeaver 실행 → SQL Editor 열기
+3. `movie_db_dump.sql` 열고 전체 실행 (Ctrl+A → Ctrl+Enter)
+4. 완료 후, `movie_db` 확인
+
 ## 👥 팀원별 역할
 
 | 이름   | 역할                         | 주요 구현 파일 |
