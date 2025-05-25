@@ -19,6 +19,7 @@ public class DBUtil {
             String password = prop.getProperty("db.password");
 
             Class.forName("com.mysql.cj.jdbc.Driver");
+            
             return DriverManager.getConnection(url, user, password);
 
         } catch (IOException | ClassNotFoundException | SQLException e) {
