@@ -9,7 +9,6 @@ import java.util.List;
 
 public class MovieDAO {
 	
-	aa
     // ✅ 해당 movie_id가 DB에 존재하는지 확인
     public boolean existsById(int movieId) {
         String sql = "SELECT 1 FROM movie WHERE movie_id = ?";
