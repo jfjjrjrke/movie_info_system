@@ -11,12 +11,16 @@ public class ReviewDAO {
     // ✅ 리뷰 삽입
     public void insertReview(ReviewDTO review) {
         String sql = "INSERT INTO review (movie_id, reviewer, content) VALUES (?, ?, ?)";
+        
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        	
             pstmt.setInt(1, review.getMovieId());
             pstmt.setString(2, review.getReviewer());
             pstmt.setString(3, review.getContent());
             pstmt.executeUpdate();
+            System.out.println("✅ 리뷰 등록 완료");
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }

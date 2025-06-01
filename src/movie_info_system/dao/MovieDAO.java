@@ -129,4 +129,19 @@ public class MovieDAO {
 
         return result;
     }
+    
+    public Integer getMovieIdByTitle(String title) {
+        String sql = "SELECT movie_id FROM movie WHERE title = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, title);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("movie_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // 조회 실패 시
+    }
 }
