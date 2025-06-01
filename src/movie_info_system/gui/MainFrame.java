@@ -66,6 +66,19 @@ public class MainFrame {
         JButton searchButton = new JButton("검색");
         leftSearchPanel.add(searchField);
         leftSearchPanel.add(searchButton);
+        
+        // 🔑 Enter 키로 검색 가능하게 추가
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    performSearch(); // 아래에 이 메서드 정의 필요
+                }
+            }
+        });
+
+        // 검색 버튼 클릭 시도 동일한 동작
+        searchButton.addActionListener(e -> performSearch());
 
         // 오른쪽 즐겨찾기 추가 버튼
         JButton favButton = new JButton("즐겨찾기 추가");
@@ -216,6 +229,19 @@ public class MainFrame {
 	// MainFrame.java 내부에 아래 메서드 추가
 	public JFrame getFrame() {
 	    return frame;
+	}
+
+	private void performSearch() {
+	    String query = searchField.getText().trim();
+	    if (!query.isEmpty()) {
+	        MovieDAO dao = new MovieDAO();
+	        List<MovieDTO> result = dao.searchMovies(query);
+
+	        tableModel.setRowCount(0);
+	        for (MovieDTO m : result) {
+	            tableModel.addRow(new Object[]{m.getTitle(), m.getReleaseDate(), m.getRating()});
+	        }
+	    }
 	}
 
 }
