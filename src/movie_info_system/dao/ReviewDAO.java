@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewDAO {
-
+aa
     // ✅ 리뷰 삽입
     public void insertReview(ReviewDTO review) {
         String sql = "INSERT INTO review (movie_id, reviewer, content) VALUES (?, ?, ?)";

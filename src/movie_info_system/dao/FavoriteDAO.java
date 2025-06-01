@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FavoriteDAO {
-
+aa
     // ✅ 즐겨찾기 추가
     public boolean addFavorite(FavoriteDTO favorite) {
         String sql = "INSERT INTO favorite (movie_id, user_id) VALUES (?, ?)";
