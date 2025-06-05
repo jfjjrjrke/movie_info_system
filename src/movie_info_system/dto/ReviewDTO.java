@@ -1,33 +1,20 @@
 package movie_info_system.dto;
 
+import lombok.*;
 import java.sql.Timestamp;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewDTO {
     private int reviewId;
     private int movieId;
-    private String reviewer;
+    private String reviewer; // 또는 userId (DB에 맞게 유지)
     private String content;
     private Timestamp createdAt;
 
-    // 저장용 생성자
-    public ReviewDTO(int movieId, String reviewer, String content) {
-        this.movieId = movieId;
-        this.reviewer = reviewer;
-        this.content = content;
-    }
-
-    // 조회용 생성자
-    public ReviewDTO(int reviewId, int movieId, String reviewer, String content, Timestamp createdAt) {
-        this.reviewId = reviewId;
-        this.movieId = movieId;
-        this.reviewer = reviewer;
-        this.content = content;
-        this.createdAt = createdAt;
-    }
-
-    public int getReviewId() { return reviewId; }
-    public int getMovieId() { return movieId; }
-    public String getReviewer() { return reviewer; }
-    public String getContent() { return content; }
-    public Timestamp getCreatedAt() { return createdAt; }
+    // TMDB용 확장 필드
+    private String updatedAt;  // ISO 포맷 시간 문자열
+    private double rating;     // TMDB 사용자 평점 (0~10)
 }

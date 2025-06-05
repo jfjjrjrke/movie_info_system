@@ -9,7 +9,7 @@ import movie_info_system.dto.ReviewDTO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.sql.SQLException;
 import java.util.List;
 
 public class ReviewPanel extends JPanel {
@@ -19,13 +19,16 @@ public class ReviewPanel extends JPanel {
     private JList<String> reviewList;
     private String currentMovieTitle = null;
 
+    /**
+     * 생성자 - 리뷰 입력창, 저장 버튼, 리뷰 리스트 구성
+     */
     public ReviewPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5), "리뷰"));
-        setAlignmentX(Component.LEFT_ALIGNMENT);  // ⬅ ReviewPanel 자체 정렬
+        setAlignmentX(Component.LEFT_ALIGNMENT);  // ReviewPanel 자체 정렬
 
-        // 🔹 입력 영역
+        // 입력 영역 설정
         inputArea = new JTextArea(3, 40);
         inputArea.setMargin(new Insets(5, 5, 5, 5)); // 내부 여백 최소화
         inputArea.setLineWrap(true);
@@ -34,19 +37,17 @@ public class ReviewPanel extends JPanel {
         inputScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(inputScroll);
 
-        // 🔹 여백
-        add(Box.createVerticalStrut(5));
+        add(Box.createVerticalStrut(5));  // 여백
 
-        // 🔹 저장 버튼 (크기 고정)
+        // 저장 버튼 설정
         saveButton = new JButton("리뷰 저장");
-        saveButton.setMaximumSize(new Dimension(100, 30));  // 너비, 높이 제한
+        saveButton.setMaximumSize(new Dimension(100, 30));
         saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(saveButton);
 
-        // 🔹 여백
-        add(Box.createVerticalStrut(10));
+        add(Box.createVerticalStrut(10)); // 여백
 
-        // 🔹 리뷰 목록
+        // 리뷰 목록 설정
         reviewListModel = new DefaultListModel<>();
         reviewList = new JList<>(reviewListModel);
         JScrollPane listScroll = new JScrollPane(reviewList);
@@ -54,12 +55,12 @@ public class ReviewPanel extends JPanel {
         listScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(listScroll);
 
-        // 🔹 저장 버튼 동작
+        // 저장 버튼 클릭 시 동작 (중복 검사 없이 무조건 저장)
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentMovieTitle != null && !inputArea.getText().trim().isEmpty()) {
-                    String review = inputArea.getText().trim();
+                    String reviewContent = inputArea.getText().trim();
                     inputArea.setText("");
 
                     MovieDAO movieDAO = new MovieDAO();
@@ -67,11 +68,23 @@ public class ReviewPanel extends JPanel {
                     if (movieId == null) return;
 
                     ReviewDAO reviewDAO = new ReviewDAO();
-                    ReviewDTO dto = new ReviewDTO(movieId, "guest", review);  // 작성자 고정
-                    reviewDAO.insertReview(dto);
+
+                    ReviewDTO dto = ReviewDTO.builder()
+                            .movieId(movieId)
+                            .reviewer("guest")
+                            .content(reviewContent)
+                            .build();
+
+                    // 중복 검사 없이 무조건 저장
+                    try {
+						reviewDAO.insertReview(dto);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 
                     // 리뷰 목록 새로고침
-                    List<ReviewDTO> reviews = reviewDAO.getReviewsByMovieId(movieId);
+                    List<ReviewDTO> reviews = reviewDAO.getLatestReviewsByMovieId(movieId, 10);
                     reviewListModel.clear();
                     for (ReviewDTO r : reviews) {
                         reviewListModel.addElement(r.getReviewer() + ": " + r.getContent());
@@ -81,10 +94,13 @@ public class ReviewPanel extends JPanel {
         });
     }
 
+    /**
+     * 현재 보여줄 영화 제목 설정 및 DB 리뷰 불러오기
+     * @param title 영화 제목
+     */
     public void setMovie(String title) {
-    	this.currentMovieTitle = title;
+        this.currentMovieTitle = title;
 
-        // ✅ movie_id를 가져오기
         MovieDAO movieDAO = new MovieDAO();
         Integer movieId = movieDAO.getMovieIdByTitle(title);
 
@@ -93,15 +109,12 @@ public class ReviewPanel extends JPanel {
             return;
         }
 
-        // ✅ DB에서 리뷰 리스트 불러오기
         ReviewDAO reviewDAO = new ReviewDAO();
-        List<ReviewDTO> reviews = reviewDAO.getReviewsByMovieId(movieId);
+        List<ReviewDTO> reviews = reviewDAO.getLatestReviewsByMovieId(movieId, 10);
 
-        // ✅ 리스트에 출력
         reviewListModel.clear();
         for (ReviewDTO review : reviews) {
             reviewListModel.addElement(review.getReviewer() + ": " + review.getContent());
         }
     }
-
 }

@@ -1,29 +1,27 @@
 package movie_info_system.dto;
 
-import java.time.LocalDate;
+import lombok.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MovieDTO {
-    private int movieId;
+    private int movieId; // DB 저장용 기본 ID
     private String title;
     private String overview;
     private LocalDate releaseDate;
     private String posterPath;
     private float rating;
 
-    public MovieDTO(int movieId, String title, String overview, LocalDate releaseDate, String posterPath, float rating) {
-        this.movieId = movieId;
-        this.title = title;
-        this.overview = overview;
-        this.releaseDate = releaseDate;
-        this.posterPath = posterPath;
-        this.rating = rating;
-    }
-
-    // getter만 넣어도 충분
-    public int getMovieId() { return movieId; }
-    public String getTitle() { return title; }
-    public String getOverview() { return overview; }
-    public LocalDate getReleaseDate() { return releaseDate; }
-    public String getPosterPath() { return posterPath; }
-    public float getRating() { return rating; }
+    // TMDB용 확장 필드 (필요한 경우 활용)
+    private String originalTitle;
+    private String backdropPath;
+    private double voteAverage;
+    private int voteCount;
+    private double popularity;
+    private List<String> genres;
 }
