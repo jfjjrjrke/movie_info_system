@@ -88,6 +88,34 @@ try (Connection conn = DBUtil.getConnection()) {
 }
 ```
 
+## 🧱 DB 생성 방법
+
+### 🔹 방법 1: SQL 파일로 테이블 생성 (초기 빈 테이블)
+
+1. MySQL에서 `movie_db` 데이터베이스를 생성합니다:
+
+   ```sql
+   CREATE DATABASE IF NOT EXISTS movie_db;
+   USE movie_db;
+   ```
+
+2. 프로젝트 폴더의 `create_tables.sql` 파일을 실행하여 테이블을 생성합니다.
+
+   * DB 클라이언트 툴 (DBeaver, MySQL Workbench 등) 또는 CLI에서 실행 가능
+
+### 🔹 방법 2: 덤프 파일로 전체 데이터 복원 (예제 데이터 포함)
+
+1. `movie_db_dump.sql` 파일을 실행하여 테이블 + 예제 데이터를 한 번에 복원합니다.
+
+   * DB에 `movie_db`가 없으면 자동 생성됩니다.
+   * 사용 방법 (CLI 기준):
+
+     ```bash
+     mysql -u root -p < movie_db_dump.sql
+     ```
+
+2. DBeaver 등 GUI 툴에서는 `SQL Editor`에서 `movie_db_dump.sql` 파일을 열고 실행하면 됩니다.
+
 ## 📁 리소스 설정 안내 (TMDB 로고 표시용)
 
 본 프로젝트에서는 TMDB 로고 이미지를 표시하기 위해 `resources/assets/logo_tmdb.png` 파일을 사용합니다.
