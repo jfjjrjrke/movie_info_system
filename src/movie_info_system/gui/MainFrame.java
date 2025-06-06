@@ -100,22 +100,39 @@ public class MainFrame {
 
         frame.getContentPane().add(centerPanel, BorderLayout.CENTER);
         
-	    // TMDB 출처 문구만 하단에 표시하는 코드
-	    JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-	
-	    // TMDB 출처 문구 작성 (라이선스 준수용 문구)
-	    // 공식 문구: "This product uses the TMDB API but is not endorsed or certified by TMDB."
-	    JLabel attributionLabel = new JLabel(
-	        "<html>This product uses the TMDB API but is not endorsed or certified by TMDB.</html>"
-	    );
-	    attributionLabel.setFont(new Font("SansSerif", Font.PLAIN, 11)); // 작은 회색 글씨로 표시
-	    attributionLabel.setForeground(Color.GRAY);
-	
-	    // 출처 문구를 패널에 추가
-	    footerPanel.add(attributionLabel);
-	
-	    // 만든 패널을 메인 프레임 하단(BorderLayout.SOUTH)에 추가
-	    frame.getContentPane().add(footerPanel, BorderLayout.SOUTH);
+        
+        // TMDB 로고 + 출처 문구 표시 (하단)
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        try {
+            // resources/assets/logo_tmdb.png → 클래스패스 기준 경로로 불러오기
+            URL logoUrl = getClass().getResource("/assets/logo_tmdb.png");
+            
+            if (logoUrl != null) {
+                Image img = ImageIO.read(logoUrl);
+                Image scaled = img.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+                JLabel logoLabel = new JLabel(new ImageIcon(scaled));
+                footerPanel.add(logoLabel);
+            } else {
+                System.err.println("TMDB 로고 이미지 리소스를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            System.err.println("TMDB 로고 로드 실패: " + e.getMessage());
+        }
+
+        // TMDB 출처 문구
+        JLabel attributionLabel = new JLabel(
+            "<html>This product uses the TMDB API but is not endorsed or certified by TMDB.</html>"
+        );
+        attributionLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        attributionLabel.setForeground(Color.GRAY);
+        footerPanel.add(attributionLabel);
+
+        // 하단에 추가
+        frame.getContentPane().add(footerPanel, BorderLayout.SOUTH);
+        
+        
+        
 
         // 우측 패널 - 영화 세부정보 + 즐겨찾기
         JPanel rightPanel = new JPanel();
