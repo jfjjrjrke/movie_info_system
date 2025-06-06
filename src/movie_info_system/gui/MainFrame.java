@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -46,6 +47,7 @@ public class MainFrame {
         initialize();
     }
 
+    // 기본 구성을 설정하는 메서드
     private void initialize() {
         frame = new JFrame();
         frame.setTitle("영화 검색 프로그램");
@@ -53,16 +55,15 @@ public class MainFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
 
-        // 상단 검색 패널 구성
+        // 상단 검색 패널
         JPanel searchPanel = new JPanel(new BorderLayout());
-
         JPanel leftSearchPanel = new JPanel();
         searchField = new JTextField(25);
         JButton searchButton = new JButton("검색");
         leftSearchPanel.add(searchField);
         leftSearchPanel.add(searchButton);
 
-        // 엔터키 입력시 검색 수행
+        // 엔터키 입력 시 검색 실행
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -74,25 +75,22 @@ public class MainFrame {
         searchButton.addActionListener(e -> performSearch());
 
         JButton favButton = new JButton("즐겨찾기 추가");
-
         searchPanel.add(leftSearchPanel, BorderLayout.WEST);
         searchPanel.add(favButton, BorderLayout.EAST);
-
         frame.getContentPane().add(searchPanel, BorderLayout.NORTH);
 
-        // 중앙 패널: 영화 목록 테이블 + 리뷰 패널
+        // 중앙 패널 - 영화 목록 테이블 + 리뷰 패널
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-
-        tableModel = new DefaultTableModel(new Object[][] {}, new String[] { "제목", "개봉일", "평점" });
+        tableModel = new DefaultTableModel(new Object[][] {}, new String[] { "제목", "개발일", "평점" });
         table = new JTable(tableModel);
         JScrollPane tableScrollPane = new JScrollPane(table);
         tableScrollPane.setPreferredSize(new Dimension(600, 300));
-        tableScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300)); // 높이 고정
+        tableScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
         tableScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         centerPanel.add(tableScrollPane);
 
-        // 리뷰 패널 생성 및 기본 숨김 처리
+        // 리뷰 패널 생성 (기본은 숨기기)
         reviewPanel = new ReviewPanel();
         reviewPanel.setPreferredSize(new Dimension(600, 200));
         reviewPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
@@ -102,7 +100,7 @@ public class MainFrame {
 
         frame.getContentPane().add(centerPanel, BorderLayout.CENTER);
 
-        // 우측 패널: 영화 상세정보 + 즐겨찾기 목록
+        // 우측 패널 - 영화 세부정보 + 즐겨찾기
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         frame.getContentPane().add(rightPanel, BorderLayout.EAST);
@@ -114,14 +112,13 @@ public class MainFrame {
         rightPanel.add(favoritesPanel);
         favoritesPanel.loadFavoritesFromDB();
 
-        // 즐겨찾기 추가 버튼 이벤트 처리
+        // 즐겨찾기 등록 버튼
         favButton.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
                 String title = table.getValueAt(row, 0).toString();
                 MovieDAO movieDAO = new MovieDAO();
                 Integer movieId = movieDAO.getMovieIdByTitle(title);
-
                 if (movieId != null) {
                     FavoriteDAO favoriteDAO = new FavoriteDAO();
                     if (!favoriteDAO.isFavorite(movieId, USER_ID)) {
@@ -134,19 +131,72 @@ public class MainFrame {
             }
         });
 
-        // 영화 목록 클릭 시 상세정보 및 리뷰 표시
+        // 테이블 선택 시 상세 + 리뷰 표시
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
                 if (row != -1) {
                     String title = table.getValueAt(row, 0).toString();
-
                     MovieDAO movieDAO = new MovieDAO();
                     Integer movieId = movieDAO.getMovieIdByTitle(title);
                     MovieDTO movie = movieDAO.getMovieById(movieId);
+                    if (movie != null) {
+                        String baseImageUrl = "https://image.tmdb.org/t/p/w500";
+                        String posterPath = movie.getPosterPath();
+                        ImageIcon posterIcon = null;
+                        if (posterPath != null && !posterPath.isEmpty()) {
+                            posterIcon = loadPosterImage(baseImageUrl + posterPath);
+                        }
+                        detailPanel.setMovieDetail(
+                                movie.getTitle(),
+                                movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
+                                String.valueOf(movie.getRating()),
+                                movie.getOverview(),
+                                posterIcon
+                        );
+
+                        // ✅ 리뷰 패널에도 현재 영화 제목 설정 (리뷰 저장 작동하려면 꼭 필요)
+                        reviewPanel.setMovie(title);
+
+                        // TMDB + 내가 쓴 리뷰 같이 보여줌
+                        ReviewAPI reviewAPI = new ReviewAPI();
+                        List<ReviewDTO> apiReviews = reviewAPI.getMovieReviews(movieId, 1);
+                        ReviewDAO reviewDAO = new ReviewDAO();
+                        List<ReviewDTO> myReviews = reviewDAO.getLatestReviewsByMovieId(movieId, 10);
+                        List<ReviewDTO> allReviews = new ArrayList<>();
+                        allReviews.addAll(myReviews);
+                        allReviews.addAll(apiReviews);
+
+                        reviewPanel.setReviews(allReviews);
+                        reviewPanel.setVisible(true);
+                        System.out.println("💬 내가 쓴 리뷰 " + myReviews.size() + "개, TMDB 리뷰 " + apiReviews.size() + "개");
+                    }
+                }
+            }
+        });
+
+
+        // 즐겨찾기에서 영화 선택 시 불러오기
+        favoritesPanel.getFavoritesList().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    String selectedTitle = favoritesPanel.getFavoritesList().getSelectedValue();
+                    if (selectedTitle == null || selectedTitle.isEmpty()) return;
+
+                    MovieDAO movieDAO = new MovieDAO();
+                    Integer movieId = movieDAO.getMovieIdByTitle(selectedTitle);
+                    MovieDTO movie = movieDAO.getMovieById(movieId);
 
                     if (movie != null) {
+                        tableModel.setRowCount(0);
+                        tableModel.addRow(new Object[]{
+                            movie.getTitle(),
+                            movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
+                            movie.getRating()
+                        });
+
                         String baseImageUrl = "https://image.tmdb.org/t/p/w500";
                         String posterPath = movie.getPosterPath();
                         ImageIcon posterIcon = null;
@@ -161,62 +211,16 @@ public class MainFrame {
                                 movie.getOverview(),
                                 posterIcon
                         );
-                        // 리뷰 API 테스트 코드 추가
+
+                        // ✅ 리뷰 패널 수동 갱신 (내 리뷰 + TMDB 리뷰)
+                        ReviewDAO reviewDAO = new ReviewDAO();
                         ReviewAPI reviewAPI = new ReviewAPI();
-                        List<ReviewDTO> reviews = reviewAPI.getMovieReviews(movieId, 1);
-
-                        System.out.println("API로부터 가져온 리뷰 개수: " + reviews.size());
-                        for (ReviewDTO r : reviews) {
-                            System.out.println(r.getReviewer() + ": " + r.getContent());
-                        }
-
-                        // 기존 리뷰 패널 업데이트 부분 유지
-                        reviewPanel.setMovie(title);
-                        reviewPanel.setVisible(true);
-                    }
-
-                    reviewPanel.setMovie(title);  // 리뷰 패널 데이터 업데이트
-                    reviewPanel.setVisible(true);
-                }
-            }
-        });
-
-        // 즐겨찾기 목록 더블 클릭 시 영화 상세정보 + 리뷰 표시, 테이블 해당 영화만 표시
-        favoritesPanel.getFavoritesList().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() == 2) {
-                    String selectedTitle = favoritesPanel.getFavoritesList().getSelectedValue();
-                    if(selectedTitle == null || selectedTitle.isEmpty()) return;
-
-                    MovieDAO movieDAO = new MovieDAO();
-                    Integer movieId = movieDAO.getMovieIdByTitle(selectedTitle);
-                    MovieDTO movie = movieDAO.getMovieById(movieId);
-
-                    if(movie != null) {
-                        tableModel.setRowCount(0);
-                        tableModel.addRow(new Object[] {
-                            movie.getTitle(),
-                            movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
-                            movie.getRating()
-                        });
-
-                        String baseImageUrl = "https://image.tmdb.org/t/p/w500";
-                        String posterPath = movie.getPosterPath();
-                        ImageIcon posterIcon = null;
-                        if(posterPath != null && !posterPath.isEmpty()) {
-                            posterIcon = loadPosterImage(baseImageUrl + posterPath);
-                        }
-
-                        detailPanel.setMovieDetail(
-                                movie.getTitle(),
-                                movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
-                                String.valueOf(movie.getRating()),
-                                movie.getOverview(),
-                                posterIcon
-                        );
-
-                        reviewPanel.setMovie(selectedTitle);
+                        List<ReviewDTO> myReviews = reviewDAO.getLatestReviewsByMovieId(movieId, 10);
+                        List<ReviewDTO> apiReviews = reviewAPI.getMovieReviews(movieId, 1);
+                        List<ReviewDTO> allReviews = new ArrayList<>();
+                        allReviews.addAll(myReviews);
+                        allReviews.addAll(apiReviews);
+                        reviewPanel.setReviews(allReviews);
                         reviewPanel.setVisible(true);
 
                         table.setRowSelectionInterval(0, 0);
@@ -226,84 +230,51 @@ public class MainFrame {
             }
         });
 
-        // 프로그램 시작 시 인기 영화 자동 저장 및 화면 표시
+
+        // 프로그램 시작시 인기 영화 DB에 저장 + 표시
         fetchAndStorePopularMovies(1);
         showPopularMoviesFromDB();
     }
 
-    /**
-     * JFrame 반환 메서드 (외부 접근용)
-     */
+    // JFrame 반환 (보유에 필요)
     public JFrame getFrame() {
         return frame;
     }
 
-    /**
-     * 영화 검색 메서드
-     * 검색어 없으면 DB 전체 목록, 있으면 DB 검색 후 없으면 API 검색 + DB 저장 후 다시 검색
-     */
+    // 영화 검색 시 처리 방식
     private void performSearch() {
         String query = searchField.getText().trim();
-
         MovieDAO movieDAO = new MovieDAO();
         ReviewAPI reviewAPI = new ReviewAPI();
-        ReviewDAO reviewDAO = new ReviewDAO();
         MovieAPI movieAPI = new MovieAPI();
-
         List<MovieDTO> movies;
 
         if (query.isEmpty()) {
             movies = movieDAO.getAllMovies();
         } else {
-            // 1. DB에서 영화 검색
             movies = movieDAO.searchMovies(query);
-            System.out.println("🔎 기존 DB 검색 결과: " + movies.size() + "건");
-
-            // 2. TMDB API에서 항상 검색 시도
             List<MovieDTO> apiMovies = movieAPI.searchMoviesMultiLang(query, 1);
-            System.out.println("🌐 TMDB API 검색 결과: " + apiMovies.size() + "건");
-
             for (MovieDTO m : apiMovies) {
-                System.out.println("🎬 처리 중: " + m.getTitle() + " (ID: " + m.getMovieId() + ")");
-
                 if (!movieDAO.existsById(m.getMovieId())) {
                     movieDAO.insertMovie(m);
                 }
-
-                if (movieDAO.existsById(m.getMovieId())) {
-                    List<ReviewDTO> apiReviews = reviewAPI.getMovieReviews(m.getMovieId(), 1);
-                    System.out.println("📥 리뷰 가져옴: " + apiReviews.size() + "개");
-
-                    for (ReviewDTO r : apiReviews) {
-                        System.out.println("🔥 리뷰 삽입 시도 → reviewer=" + r.getReviewer());
-
-                        try {
-                            reviewDAO.insertReview(r);  // 중복 검사 없이 무조건 삽입
-                            System.out.println("✅ 리뷰 삽입 완료: " + r.getReviewer());
-                        } catch (Exception e) {
-                            System.err.println("⛔ 예외 발생 → " + r.getReviewer());
-                            e.printStackTrace();
-                        }
-                    }
-
-                }
-
-            // 3. 영화 삽입 후 다시 DB에서 검색
-            movies = movieDAO.searchMovies(query);
-            System.out.println("🟩 DB 최종 검색 결과: " + movies.size() + "건");
             }
+            movies = movieDAO.searchMovies(query);
         }
 
-        updateTable(movies);// 테이블 갱신
+        updateTable(movies);
+
+        if (!movies.isEmpty()) {
+            MovieDTO firstMovie = movies.get(0);
+            List<ReviewDTO> apiReviews = reviewAPI.getMovieReviews(firstMovie.getMovieId(), 1);
+            SwingUtilities.invokeLater(() -> {
+                reviewPanel.setReviews(apiReviews);
+                reviewPanel.setVisible(true);
+            });
+        }
     }
 
-
-    
-
-
-    /**
-     * JTable 영화 목록 업데이트
-     */
+    // JTable 목록 갱신
     private void updateTable(List<MovieDTO> movies) {
         tableModel.setRowCount(0);
         if(movies.isEmpty()) {
@@ -319,9 +290,7 @@ public class MainFrame {
         }
     }
 
-    /**
-     * URL에서 포스터 이미지 로드 및 리사이징
-     */
+    // URL 이미지 로드
     public ImageIcon loadPosterImage(String urlString) {
         try {
             URI uri = new URI(urlString);
@@ -330,20 +299,16 @@ public class MainFrame {
             Image scaledImg = img.getScaledInstance(150, 225, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImg);
         } catch(Exception e) {
-            System.err.println("포스터 이미지 로딩 실패: " + e.getMessage());
+            System.err.println("포스터 이미지 로드 실패: " + e.getMessage());
             return null;
         }
     }
 
-    /**
-     * TMDB 인기 영화 목록 API 호출 및 DB 저장 (중복 제외)
-     */
+    // 인기 영화 데이터 발견 + DB 저장
     public void fetchAndStorePopularMovies(int page) {
         MovieAPI movieAPI = new MovieAPI();
         MovieDAO movieDAO = new MovieDAO();
-
         List<MovieDTO> popularMovies = movieAPI.getPopularMovies(page);
-
         for(MovieDTO movie : popularMovies) {
             if(!movieDAO.existsById(movie.getMovieId())) {
                 movieDAO.insertMovie(movie);
@@ -351,13 +316,10 @@ public class MainFrame {
         }
     }
 
-    /**
-     * DB에서 인기 영화 전체 불러와 JTable에 표시
-     */
+    // 인기 영화를 표시하기위해 JTable에 갱신
     private void showPopularMoviesFromDB() {
         MovieDAO movieDAO = new MovieDAO();
         List<MovieDTO> popularMovies = movieDAO.getAllMovies();
-
         tableModel.setRowCount(0);
         for(MovieDTO movie : popularMovies) {
             tableModel.addRow(new Object[] {

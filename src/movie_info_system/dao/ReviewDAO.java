@@ -7,35 +7,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewDAO {
-	static {
+
+    static {
         System.out.println("✅ ReviewDAO 클래스 로딩됨");
     }
-    // ✅ 리뷰 삽입 (중복 검사 없이 바로 삽입)
-	public void insertReview(ReviewDTO review) throws SQLException {
-	    String sql = "INSERT INTO review (movie_id, reviewer, content, created_at) VALUES (?, ?, ?, ?)";
-	    try (Connection conn = DBUtil.getConnection();
-	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-	        pstmt.setInt(1, review.getMovieId());
-	        pstmt.setString(2, review.getReviewer());
-	        pstmt.setString(3, review.getContent());
-	        pstmt.setTimestamp(4,
-	            review.getCreatedAt() != null
-	            ? review.getCreatedAt()
-	            : new Timestamp(System.currentTimeMillis())
-	        );
+    // ✅ 리뷰 삽입 (내가 작성한 리뷰)
+    public void insertReview(ReviewDTO review) throws SQLException {
+        String sql = "INSERT INTO review (movie_id, reviewer, content, created_at) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-	        pstmt.executeUpdate();
-	        System.out.println("✅ 리뷰 등록 완료");
+            pstmt.setInt(1, review.getMovieId());
+            pstmt.setString(2, review.getReviewer());
+            pstmt.setString(3, review.getContent());
+            pstmt.setTimestamp(4,
+                    review.getCreatedAt() != null
+                            ? review.getCreatedAt()
+                            : new Timestamp(System.currentTimeMillis())
+            );
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        throw e; // 필요시 예외 재전파
-	    }
-	}
+            pstmt.executeUpdate();
+            System.out.println("✅ 리뷰 등록 완료");
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 
-    // ✅ 중복 리뷰 확인 (작성자와 내용까지 포함)
+    // ✅ 중복 여부 확인 (작성자 + 내용 기준)
     public boolean existsReview(int movieId, String reviewer, String content) {
         String sql = "SELECT 1 FROM review WHERE movie_id = ? AND reviewer = ? AND content = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -53,13 +54,18 @@ public class ReviewDAO {
         }
     }
 
-
+    // ✅ 중복 없을 때만 삽입 (TMDB API용)
     public boolean insertReviewIfNotExists(ReviewDTO review) throws SQLException {
         if (existsReview(review.getMovieId(), review.getReviewer(), review.getContent())) {
             System.out.println("⚠️ 중복 리뷰 생략");
             return false;
         }
 
+        return insertInternal(review);
+    }
+
+    // 공통 삽입 로직
+    private boolean insertInternal(ReviewDTO review) throws SQLException {
         String sql = "INSERT INTO review (movie_id, reviewer, content, created_at) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -68,9 +74,9 @@ public class ReviewDAO {
             pstmt.setString(2, review.getReviewer());
             pstmt.setString(3, review.getContent());
             pstmt.setTimestamp(4,
-                review.getCreatedAt() != null
-                ? review.getCreatedAt()
-                : new Timestamp(System.currentTimeMillis())
+                    review.getCreatedAt() != null
+                            ? review.getCreatedAt()
+                            : new Timestamp(System.currentTimeMillis())
             );
 
             pstmt.executeUpdate();
@@ -80,30 +86,11 @@ public class ReviewDAO {
         } catch (SQLException e) {
             System.err.println("⛔ 삽입 실패: " + e.getMessage());
             e.printStackTrace();
-            throw e;  // 호출자에게 던짐
+            throw e;
         }
     }
 
-
-
-
-
-    // ✅ 리뷰 삭제
-    public boolean deleteReview(int reviewId) {
-        String sql = "DELETE FROM review WHERE review_id = ?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, reviewId);
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // ✅ 최신 리뷰 N개 조회
+    // ✅ 특정 영화의 최신 리뷰 N개 조회 (내 리뷰 + API 통합 출력용)
     public List<ReviewDTO> getLatestReviewsByMovieId(int movieId, int limit) {
         List<ReviewDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM review WHERE movie_id = ? ORDER BY created_at DESC LIMIT ?";
@@ -128,6 +115,7 @@ public class ReviewDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
     }
 }
