@@ -99,6 +99,23 @@ public class MainFrame {
         centerPanel.add(reviewPanel);
 
         frame.getContentPane().add(centerPanel, BorderLayout.CENTER);
+        
+	    // TMDB 출처 문구만 하단에 표시하는 코드
+	    JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+	
+	    // TMDB 출처 문구 작성 (라이선스 준수용 문구)
+	    // 공식 문구: "This product uses the TMDB API but is not endorsed or certified by TMDB."
+	    JLabel attributionLabel = new JLabel(
+	        "<html>This product uses the TMDB API but is not endorsed or certified by TMDB.</html>"
+	    );
+	    attributionLabel.setFont(new Font("SansSerif", Font.PLAIN, 11)); // 작은 회색 글씨로 표시
+	    attributionLabel.setForeground(Color.GRAY);
+	
+	    // 출처 문구를 패널에 추가
+	    footerPanel.add(attributionLabel);
+	
+	    // 만든 패널을 메인 프레임 하단(BorderLayout.SOUTH)에 추가
+	    frame.getContentPane().add(footerPanel, BorderLayout.SOUTH);
 
         // 우측 패널 - 영화 세부정보 + 즐겨찾기
         JPanel rightPanel = new JPanel();

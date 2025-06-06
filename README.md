@@ -1,10 +1,10 @@
-# 🎬 영화 정보 관리 프로그램
+# 🎮 영화 정보 관리 프로그램
 
 ## 📌 프로젝트 소개
 
-사용자가 원하는 영화의 정보를 TMDB API로 검색하고, 해당 영화에 대한 상세정보, 리뷰를 확인할 수 있고, 즐겨찾기로 저장할 수 있는 Java 기반의 영화 정보 관리 시스템입니다.
+TMDB API를 활용하여 영화 정보를 검색하고, 상세정보와 리뷰를 확인하고, 즐겨찾기로 저장할 수 있는 **Java 기반의 영화 정보 관리 시스템**입니다. GUI 기반의 직관적인 인터페이스와 MySQL 연동을 통해 사용자가 손쉽게 영화 데이터를 관리할 수 있도록 설계되어 있습니다.
 
-## 🛠 사용 기술
+## 💪 사용 기술
 
 * Java 8+
 * Swing (GUI)
@@ -16,54 +16,55 @@
 
 ```
 MovieInfoProject/
-├── README.md                   # 설명서 (현재 파일)
-├── .gitignore                  # Git 제외 파일 설정
-├── movie_db_dump.sql          # DB 전체 보관용 데이터 덤프
-├── create_tables.sql          # DB 테이블 생성 SQL
-├── db.properties              # 실제 DB 연결 설정 파일 (Git에는 업로드 안함)
-├── db.properties.example      # DB 연결 예시 설정 파일 (GitHub에 포함)
-├── apikey.properties           # TMDB API 키 설정 파일 (Git에는 업로드 안함)
-├── apikey.properties.example   # TMDB API 예시 설정 파일 (GitHub에 포함)
+├── README.md                    # 설명서
+├── .gitignore                   # Git 제외 파일 설정
+├── movie_db_dump.sql           # 전체 데이터 덤프
+├── create_tables.sql           # 테이블 생성 SQL
+├── db.properties               # DB 연결 설정 (업로드 금지)
+├── db.properties.example       # DB 설정 예시
+├── apikey.properties           # TMDB API 키 설정 (업로드 금지)
+├── apikey.properties.example   # TMDB API 키 예시
 ├── src/
-│   ├── main/                  # 실행 시작점
+│   ├── main/
 │   │   └── Main.java
-│   ├── movie_info_system/gui/ # GUI 관리 클래스
-│   │   ├── MainFrame.java
-│   │   ├── MovieDetailPanel.java
-│   │   ├── ReviewPanel.java
-│   │   └── FavoritesPanel.java
-│   ├── movie_info_system/api/ # TMDB API 연동
-│   │   ├── MovieAPI.java
-│   │   ├── ReviewAPI.java
-│   │   └── TMDBConfig.java
-│   ├── movie_info_system/dto/ # 데이터 전송 객체
-│   │   ├── MovieDTO.java
-│   │   ├── ReviewDTO.java
-│   │   └── FavoriteDTO.java
-│   ├── movie_info_system/dao/ # DB 처리 클래스
-│   │   ├── MovieDAO.java
-│   │   ├── ReviewDAO.java
-│   │   ├── FavoriteDAO.java
-│   │   └── DBUtil.java
-│   └── test/                  # 테스트 코드
-│       └── DBTest.java        # DB 연결 테스트용 클래스
+│   ├── movie_info_system/
+│   │   ├── gui/                # GUI 구성
+│   │   │   ├── MainFrame.java
+│   │   │   ├── MovieDetailPanel.java
+│   │   │   ├── ReviewPanel.java
+│   │   │   └── FavoritesPanel.java
+│   │   ├── api/                # API 연동
+│   │   │   ├── MovieAPI.java
+│   │   │   ├── ReviewAPI.java
+│   │   │   └── TMDBConfig.java
+│   │   ├── dto/                # 데이터 객체
+│   │   │   ├── MovieDTO.java
+│   │   │   ├── ReviewDTO.java
+│   │   │   └── FavoriteDTO.java
+│   │   └── dao/                # DB 연동
+│   │       ├── MovieDAO.java
+│   │       ├── ReviewDAO.java
+│   │       ├── FavoriteDAO.java
+│   │       └── DBUtil.java
+│   └── test/
+│       └── DBTest.java
 ```
 
 ## ▶ 실행 방법
 
-### ✅ API 설정 방법
+### ✅ API 설정
 
-1. `apikey.properties.example` 파일을 복사하여 `apikey.properties`로 변경
-2. 해당 파일에 TMDB API 키 입력
+1. `apikey.properties.example` → `apikey.properties`로 복사
+2. 다음과 같이 TMDB API 키 입력
 
 ```properties
 TMDB_API_KEY=your_tmdb_api_key
 ```
 
-### ✅ DB 설정 방법
+### ✅ DB 설정
 
-1. `db.properties.example` 파일을 복사하여 `db.properties`로 변경
-2. 로컬 또는 클라우드 DB 접속 정보 입력
+1. `db.properties.example` → `db.properties`로 복사
+2. DB 접속 정보 입력
 
 ```properties
 db.url=jdbc:mysql://localhost:3306/movie_db
@@ -71,83 +72,67 @@ db.user=root
 db.password=your_password
 ```
 
-3. `create_tables.sql` 또는 `movie_db_dump.sql`을 DBeaver에서 실행
-4. Eclipse에서 `Main.java` 실행 → `MainFrame` 으로 GUI 실행
-5. 영화 검색 → 상세정보 확인 → 즐겨찾기 / 리뷰 기능 사용 가능
+3. `create_tables.sql` 또는 `movie_db_dump.sql`로 DB 생성
+4. Eclipse에서 `Main.java` 실행 → GUI 시작
 
-### ✅ DB 연결 테스트 방법
-
-* `src/test/DBTest.java` 실행
+### ✅ DB 연결 테스트
 
 ```java
-import java.sql.Connection;
-import movie_info_system.dao.DBUtil;
-
-public class DBTest {
-    public static void main(String[] args) {
-        try (Connection conn = DBUtil.getConnection()) {
-            if (conn != null) {
-                System.out.println("✅ DB 연결 성공!");
-            } else {
-                System.out.println("❌ DB 연결 실패!");
-            }
-        } catch (Exception e) {
-            System.out.println("❌ 예외 발생: " + e.getMessage());
-        }
-    }
+try (Connection conn = DBUtil.getConnection()) {
+    System.out.println(conn != null ? "✅ DB 연결 성공!" : "❌ DB 연결 실패!");
+} catch (Exception e) {
+    System.out.println("⛔ 예외 발생: " + e.getMessage());
 }
 ```
 
-## 👥 팀원별 역할 및 구현 파일
+## 👥 팀원별 역할 분담
 
-| 이름  | 역할                                 | 주요 구현 파일                                                                                                    |
-| --- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 김수빈 | GUI 프레임 구성 및 이벤트 제어, 리뷰/즐겨찾기 패널 구현 | `Main.java`, `MainFrame.java`, `MovieDetailPanel.java`, `ReviewPanel.java`, `FavoritesPanel.java`           |
-| 최우진 | API 연동 및 DTO 정의                    | `MovieAPI.java`, `ReviewAPI.java`, `TMDBConfig.java`, `MovieDTO.java`, `ReviewDTO.java`, `FavoriteDTO.java` |
-| 지현우 | DB 연동 및 DAO 구현                     | `MovieDAO.java`, `ReviewDAO.java`, `FavoriteDAO.java`, `DBUtil.java`                                        |
+| 이름  | 역할 요약                                        | 구현 파일                                                                                                       |
+| --- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 김수빈 | GUI 시각적 구성 (화면 배치 및 레이아웃)                    | `MainFrame.java`, `ReviewPanel.java`, `FavoritesPanel.java`, `MovieDetailPanel.java`                        |
+| 지현우 | DB 연동 및 이벤트 처리, 비즈니스 로직 구현 (GUI 구성요소와 기능 연동) | `MainFrame.java`, `MovieDAO.java`, `ReviewDAO.java`, `FavoriteDAO.java`, `DBUtil.java`                      |
+| 최우진 | TMDB API 연동 및 DTO 정의                         | `MovieAPI.java`, `ReviewAPI.java`, `TMDBConfig.java`, `MovieDTO.java`, `ReviewDTO.java`, `FavoriteDTO.java` |
 
----
-
-## ✅ GUI 구성 요소별 기능 설명 (김수빈 담당)
-
-| UI 구성 요소                      | 기능 설명                                                      |
-| ----------------------------- | ---------------------------------------------------------- |
-| 🔍 검색창 (JTextField + JButton) | 키워드 입력 후 버튼 클릭 시 `MovieAPI.searchMovies()` 호출 → 결과 표시      |
-| 🎮 영화 상세정보 패널                 | 테이블에서 영화 선택 시 상세정보 조회 후 출력                                 |
-| ⭐ 즐겨찾기 버튼                     | 선택된 영화 정보를 즐겨찾기로 DB에 저장 (`MovieDAO.addToFavorites()`)      |
-| 💬 리뷰 추가 버튼                   | 리뷰 텍스트 입력 후 저장 버튼 클릭 시 DB에 등록 (`ReviewDAO.insertReview()`) |
-| 📄 리뷰 목록                      | 현재 영화에 등록된 리뷰 리스트 출력 (`ReviewDAO.getReviewsByMovieId()`)   |
-| ❤️ 즐겨찾기 목록                    | 사용자 즐겨찾기 목록 보기 및 삭제 기능 제공                                  |
+※ GUI는 김수빈이 초기 구성하였고, 그 안의 이벤트 처리 (검색, 즐겨찾기, 리뷰 저장 등)와 DB 호출, 데이터 연동은 지현우가 구현하였습니다.
 
 ---
 
-## 🔗 협업 시 주고받는 정보 및 연결 흐름
+## ✅ 주요 기능 설명
 
-| 항목                               | 주체 → 수신자            | 설명                                  |
-| -------------------------------- | ------------------- | ----------------------------------- |
-| DTO 객체 (`MovieDTO`, `ReviewDTO`) | API 담당 → GUI, DB 담당 | TMDB API 응답 결과를 JSON → DTO로 변환 후 전달 |
-| DAO 호출용 입력 데이터                   | GUI → DB 담당         | 리뷰 추가, 즐겨찾기 등에 필요한 정보 전달            |
-| `.properties` 예시 파일              | 전체 팀 공유             | 개인 환경에 맞게 복사 및 설정                   |
-| API 응답 구조 및 파싱 로직                | API 담당 → 팀원 공유      | JSON 구조 예시와 응답 샘플 제공                |
-| 리뷰 및 즐겨찾기 조회 데이터                 | DB 담당 → GUI         | DB에서 불러온 리스트를 GUI에 출력               |
+| 기능      | 설명                                            |
+| ------- | --------------------------------------------- |
+| 영화 검색   | TMDB API + DB를 활용한 영화 통합 검색 결과 표시             |
+| 영화 상세보기 | 영화 선택 시 상세정보 표시 (포스터, 개요, 평점, 출시일 등)          |
+| 즐겨찾기    | 즐겨찾기 등록/삭제 및 목록 표시 (DB에 저장)                   |
+| 리뷰 관리   | TMDB 리뷰 + 직접 작성한 리뷰 통합 표시, 내가 쓴 리뷰는 DB에 저장 가능 |
+
+## 🔄 협업 & 데이터 흐름
+
+| 항목               | 제공자 → 수신자      | 설명                       |
+| ---------------- | -------------- | ------------------------ |
+| DTO (`MovieDTO`) | API → GUI/DB   | JSON 응답을 DTO로 변환해 전달     |
+| DAO 호출 입력        | GUI → DB       | 영화 ID, 리뷰 내용 등 전달        |
+| `.properties` 설정 | 팀원 간 공유        | 개인 환경에 맞게 복사/수정          |
+| API 응답 형식        | API 담당 → 전체 공유 | 샘플 JSON 구조 제공 및 연동 형식 통일 |
 
 ---
 
 ## ☁️ 클라우드 DB 전환 계획
 
-현재는 로컬 MySQL DB를 기반으로 개발 중이며, 추후 **AWS RDS** 기반의 클라우드 DB 환경으로 전환할 예정입니다.
+* 현재: 로컬 MySQL 사용 중
+* 계획: **AWS RDS** 기반의 클라우드 환경으로 전환 예정
 
-* 클라우드 전환 시 `db.properties` 내 접속 정보만 수정하면 시스템 구조 변경 없이 동작
-* 보안(IP 제한), 백업, 접근 제어 등을 포함한 운영 환경을 적용할 예정
+  * `db.properties` 파일만 수정하여 적용 가능
+  * IP 접근 제한, 백업, 모니터링 등을 고려한 배포
 
 ---
 
-## 📌 주의사항
+## ⚠️ 주의사항
 
-* `apikey.properties`와 `db.properties`는 Git에 업로드하지 마세요.
-* `.gitignore`에 위 파일들을 반드시 포함해야 합니다.
-* TMDB API는 하루 요청 제한이 있으므로 과도한 호출을 주의하세요.
-* JDBC 드라이버는 classpath에 포함되어 있어야 정상적으로 실행됩니다.
+* `apikey.properties`, `db.properties`는 Git에 업로드 금지
+* `.gitignore`에 반드시 포함
+* TMDB API 호출은 제한이 있으므로 과도한 호출 주의
+* JDBC 드라이버는 classpath에 반드시 포함되어야 실행 가능
 
 ---
 
