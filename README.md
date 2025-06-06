@@ -48,6 +48,9 @@ MovieInfoProject/
 │   │       └── DBUtil.java
 │   └── test/
 │       └── DBTest.java
+├── resources/                  # TMDB 로고 이미지 등 리소스
+│   └── assets/
+│       └── logo_tmdb.png
 ```
 
 ## ▶ 실행 방법
@@ -84,6 +87,26 @@ try (Connection conn = DBUtil.getConnection()) {
     System.out.println("⛔ 예외 발생: " + e.getMessage());
 }
 ```
+
+## 📁 리소스 설정 안내 (TMDB 로고 표시용)
+
+본 프로젝트에서는 TMDB 로고 이미지를 표시하기 위해 `resources/assets/logo_tmdb.png` 파일을 사용합니다.
+해당 이미지가 정상적으로 로드되기 위해서는 **`resources/` 폴더를 소스 경로(Build Path)로 추가**해야 합니다.
+
+### 🔧 Eclipse 설정 방법
+
+1. 프로젝트 내 `resources/` 폴더를 마우스 오른쪽 클릭
+2. `Build Path` → `Use as Source Folder` 선택
+
+### ✅ 리소스 접근 경로
+
+```java
+getClass().getResource("/assets/logo_tmdb.png")
+```
+
+해당 경로는 `.jar` 빌드 시에도 유지되며, TMDB 로고와 출처 문구가 GUI 하단에 정상 표시됩니다.
+
+---
 
 ## 👥 팀원별 역할 분담
 
@@ -122,7 +145,7 @@ try (Connection conn = DBUtil.getConnection()) {
 * 현재: 로컬 MySQL 사용 중
 * 계획: **AWS RDS** 기반의 클라우드 환경으로 전환 예정
 
-  * `db.properties` 파일만 수정하여 적용 가능
+  * `db.properties` 파일만 수정하면 적용 가능
   * IP 접근 제한, 백업, 모니터링 등을 고려한 배포
 
 ---
