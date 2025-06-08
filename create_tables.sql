@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS review (
   reviewer VARCHAR(100),
   content TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (movie_id) REFERENCES movie(movie_id) ON DELETE CASCADE,
+  FOREIGN KEY (movie_id) REFERENCES movie(movie_id) ON DELETE CASCADE
 );
 
 -- 즐겨찾기 테이블
