@@ -182,10 +182,11 @@ public class MainFrame {
                         if (posterPath != null && !posterPath.isEmpty()) {
                             posterIcon = loadPosterImage(baseImageUrl + posterPath);
                         }
+                        String ratingStr = String.format("%.1f", (double) movie.getRating());
                         detailPanel.setMovieDetail(
                                 movie.getTitle(),
                                 movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
-                                String.valueOf(movie.getRating()),
+                                ratingStr,
                                 movie.getOverview(),
                                 posterIcon
                         );
@@ -237,11 +238,11 @@ public class MainFrame {
                         if (posterPath != null && !posterPath.isEmpty()) {
                             posterIcon = loadPosterImage(baseImageUrl + posterPath);
                         }
-
+                        String ratingStr = String.format("%.1f", (double) movie.getRating());
                         detailPanel.setMovieDetail(
                                 movie.getTitle(),
                                 movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
-                                String.valueOf(movie.getRating()),
+                                ratingStr,
                                 movie.getOverview(),
                                 posterIcon
                         );
@@ -316,10 +317,11 @@ public class MainFrame {
             return;
         }
         for(MovieDTO m : movies) {
+        	String ratingStr = String.format("%.1f", (double) m.getRating());
             tableModel.addRow(new Object[] {
                     m.getTitle() != null ? m.getTitle() : "",
                     m.getReleaseDate() != null ? m.getReleaseDate().toString() : "",
-                    m.getRating()
+                    ratingStr
             });
         }
     }
@@ -356,10 +358,11 @@ public class MainFrame {
         List<MovieDTO> popularMovies = movieDAO.getAllMovies();
         tableModel.setRowCount(0);
         for(MovieDTO movie : popularMovies) {
+        	String ratingStr = String.format("%.1f", (double) movie.getRating());
             tableModel.addRow(new Object[] {
                     movie.getTitle(),
                     movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : "",
-                    movie.getRating()
+                    ratingStr
             });
         }
     }
