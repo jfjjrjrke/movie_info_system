@@ -50,7 +50,7 @@ public class MainFrame {
     // 기본 구성을 설정하는 메서드
     private void initialize() {
         frame = new JFrame();
-        frame.setTitle("영화 검색 프로그램");
+        frame.setTitle("MovieMate");
         frame.setBounds(100, 100, 1000, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
