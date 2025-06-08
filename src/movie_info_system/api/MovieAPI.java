@@ -119,6 +119,7 @@ public class MovieAPI {
                 .voteCount(movieJson.optInt("vote_count"))
                 .popularity(movieJson.optDouble("popularity"))
                 .genres(genreNames) // 장르명 리스트 또는 ID 리스트
+                .rating((float) movieJson.optDouble("vote_average", 0.0))  // 평점
                 .build();
     }
 
